@@ -581,6 +581,19 @@ instance Ord Value where
 instance Hashable Value where
   hashWithSalt s = hashWithSalt s . valueUniqueId
 
+data Loop = Loop{ canonicalInductionVariable :: Instruction
+				, blocks :: [BasicBlock]
+			    , exitingBlocks :: [BasicBlock]
+				, uniqueExitBlocks :: [BasicBlock]
+				, parentLoop :: !(Maybe Loop)
+				, subLoops :: [Loop]
+				, isLoopSimplifyForm :: Bool
+				, isSafeToClone :: Bool
+				, isAnnotatedParallel :: Bool
+				, hasDedicatedExits :: Bool
+				, loopDepth :: Integer
+				}
+
 class HasFunction a where
   getFunction :: a -> Function
 
@@ -601,6 +614,7 @@ data Function = Function { functionType :: Type
                          , functionSection :: !(Maybe Text)
                          , functionAlign :: !Int64
                          , functionGCName :: !(Maybe Text)
+						 , functionLoops :: [Loop]
                          }
 
 functionIsVararg :: Function -> Bool
